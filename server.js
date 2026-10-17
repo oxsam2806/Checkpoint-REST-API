@@ -1,4 +1,4 @@
-
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -15,6 +15,14 @@ const app = express();
 
 // Allow Express to read JSON data sent in request bodies.
 app.use(express.json());
+
+// Serve the built React frontend from the public folder.
+app.use(express.static(path.join(__dirname, "public")));
+
+// Allow requests from our local React frontend.
+app.use(cors({
+  origin: "http://localhost:5173",
+}));
 
 // GET: Return all users from the database.
 app.get("/api/users", async (req, res) => {
@@ -77,6 +85,11 @@ app.delete("/api/users/:id", async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+});
+
+// Send the React homepage when a visitor opens the website.
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Connect to MongoDB before starting the server.
